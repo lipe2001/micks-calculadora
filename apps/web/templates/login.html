@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Login — Micks{% endblock %}
+{% block content %}
+<article style="max-width:480px;margin:auto">
+  <h3>Login</h3>
+  <form method="post" action="/login">
+    <label>Usuário
+      <input type="text" name="username" required value="admin">
+    </label>
+    <label>Senha
+      <input type="password" name="password" required value="desafio">
+    </label>
+    {% if error %}
+      <small style="color:crimson">{{ error }}</small>
+    {% endif %}
+    <button type="submit">Entrar</button>
+  </form>
+</article>
+{% endblock %}

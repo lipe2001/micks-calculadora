@@ -1,0 +1,12 @@
+<article>
+  <h4>Contratação realizada com sucesso!</h4>
+  <p>
+    <strong>ID:</strong> {{ data.id }}<br>
+    <strong>Peso total:</strong> {{ '%.2f'|format(data.total_weight) }}<br>
+    <strong>Plano:</strong> {{ data.plan }}<br>
+    <strong>Velocidade:</strong> {{ data.speed_mbps }} Mb
+  </p>
+  <p>Enviamos um e-mail de confirmação para você e para nossa equipe de operações. 📧</p>
+  <a href="/calculadora_plano">Nova simulação</a> |
+  <a href="/vendas">Ir para Vendas</a>
+</article>

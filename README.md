@@ -1,36 +1,29 @@
 # Micks Calculadora — Desafio Técnico
 
-Monorepo para a **Calculadora de Plano de Internet** (Frontend + Backend) com Docker Compose.
+Aplicação completa (API + WEB) para **calcular e contratar** plano de internet por quantidade de dispositivos.  
+Arquitetura em **monorepo**, orquestrada por **Docker Compose** (Windows + Docker Desktop).
 
 ## Stack & Portas
-- **API (3000):** Python 3.12 + FastAPI + Pydantic + SQLAlchemy 2.x + Alembic + Uvicorn
-- **WEB (3001):** FastAPI servindo templates **Jinja2** + **HTMX**
-- **Banco:** **PostgreSQL** (Docker)
-- **E-mail (dev):** **MailHog** (Docker)
-- **Orquestração:** **Docker Compose**
-- **Rotas-chave:** `/calculadora_plano`, `/vendas` (login: admin / senha: desafio)
+- **API (3000):** Python 3.12, FastAPI, Pydantic, SQLAlchemy 2.x, Alembic, Uvicorn
+- **WEB (3001):** FastAPI + Jinja2 + HTMX (consome a API)
+- **Banco:** PostgreSQL (Docker)
+- **E-mail (dev):** MailHog (Docker) — UI em `http://localhost:8025`
+- **Rotas principais:** `/calculadora_plano` e `/vendas` (login: **admin** / senha: **desafio**)
 
-## Estrutura
-```
-micks-calculadora/
-  apps/
-    api/   # FastAPI API (porta 3000)
-    web/   # FastAPI + Jinja2 + HTMX (porta 3001)
-  infra/   # docker-compose e configs
-```
+## Como rodar (Windows + Docker Desktop)
+> Pré-requisito: Docker Desktop em **Running** e WSL2 habilitado.
 
-## Como rodar (resumo)
-1. Copie `infra/.env.example` para `infra/.env` (ajuste se quiser).
-2. No terminal, na raiz do projeto:
-   ```powershell
-   docker compose -f .\infra\docker-compose.yml build --no-cache
-   docker compose -f .\infra\docker-compose.yml up -d
-   docker compose -f .\infra\docker-compose.yml run --rm api alembic upgrade head
-   ```
-3. Testes:
-   - API: http://localhost:3000/health
-   - WEB: http://localhost:3001/health
-   - MailHog: http://localhost:8025
-4. Banco: Postgres exposto em `localhost:5432` (user/db/pass: `micks`).
+```powershell
+# 1) Clonar e entrar na pasta
+git clone https://github.com/lipe2001/micks-calculadora.git
+cd micks-calculadora
 
-> **Importante:** Não commite `infra/.env`. Use o `.env.example` no Git.
+# 2) Criar o arquivo de variáveis de ambiente
+Copy-Item .\infra\.env.example .\infra\.env
+
+# 3) Build e subir os serviços
+docker compose -f .\infra\docker-compose.yml build
+docker compose -f .\infra\docker-compose.yml up -d
+
+# 4) Rodar as migrações (cria tabela sales)
+docker compose -f .\infra\docker-compose.yml run --rm api alembic upgrade head

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Vendas — Micks{% endblock %}
+{% block content %}
+<h3>Vendas</h3>
+
+<form method="get" action="/vendas">
+  <div class="grid">
+    <label>Busca (nome, e-mail, telefone)
+      <input type="text" name="q" value="{{ q }}" placeholder="Ex.: Maria, @gmail.com, 1199..." />
+    </label>
+    <label>De (data)
+      <input type="date" name="date_from" value="{{ date_from }}" />
+    </label>
+    <label>Até (data)
+      <input type="date" name="date_to" value="{{ date_to }}" />
+    </label>
+    <label>Ordenar por
+      <select name="order_by">
+        <option value="created_at" {{ 'selected' if order_by=='created_at' else '' }}>Data</option>
+        <option value="name" {{ 'selected' if order_by=='name' else '' }}>Nome</option>
+        <option value="email" {{ 'selected' if order_by=='email' else '' }}>E-mail</option>
+      </select>
+    </label>
+    <label>Direção
+      <select name="order_dir">
+        <option value="desc" {{ 'selected' if order_dir=='desc' else '' }}>Desc</option>
+        <option value="asc" {{ 'selected' if order_dir=='asc' else '' }}>Asc</option>
+      </select>
+    </label>
+  </div>
+  <button type="submit">Aplicar</button>
+</form>
+
+<table role="grid">
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Cliente</th>
+      <th>E-mail</th>
+      <th>Telefone</th>
+      <th>Dispositivos</th>
+      <th>Peso</th>
+      <th>Plano</th>
+      <th>Velocidade</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in sales %}
+    <tr>
+      <td>{{ s.created_at | replace('T',' ') | replace('Z','') }}</td>
+      <td>{{ s.name }}</td>
+      <td>{{ s.email }}</td>
+      <td>{{ s.phone }}</td>
+      <td>
+        C:{{ s.n_cellphones }} |
+        PC:{{ s.n_computers }} |
+        TV:{{ s.n_smart_tvs }} |
+        Box:{{ s.n_tv_box }} |
+        Out:{{ s.n_others }} |
+        Gamer: {{ 'Sim' if s.gamer else 'Não' }}
+      </td>
+      <td>{{ '%.2f' | format(s.total_weight) }}</td>
+      <td>{{ s.plan }}</td>
+      <td>{{ s.speed_mbps }} Mb</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8">Nenhum registro encontrado.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<hr>
+
+<!-- (Opcional) Upload XLSX -->
+<details>
+  <summary>Visualizar planilha (.xlsx)</summary>
+  <form hx-post="/vendas/upload" hx-target="#xlsx-preview" hx-swap="innerHTML" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".xlsx" required>
+    <button type="submit">Enviar e visualizar</button>
+  </form>
+  <div id="xlsx-preview">
+    <small>Escolha um arquivo .xlsx para visualizar aqui (não persiste no banco).</small>
+  </div>
+</details>
+
+{% endblock %}

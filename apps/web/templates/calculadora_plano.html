@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Calculadora — Micks{% endblock %}
+{% block content %}
+<h3>Calculadora de Plano</h3>
+
+<form
+  hx-post="/_calc"
+  hx-target="#calc-area"
+  hx-swap="innerHTML"
+>
+  <div class="grid">
+    <label>Celulares
+      <input type="number" name="n_cellphones" min="0" step="1" value="0" required>
+    </label>
+    <label>Computadores
+      <input type="number" name="n_computers" min="0" step="1" value="0" required>
+    </label>
+    <label>Smart TVs
+      <input type="number" name="n_smart_tvs" min="0" step="1" value="0" required>
+    </label>
+    <label>TV Box
+      <input type="number" name="n_tv_box" min="0" step="1" value="0" required>
+    </label>
+    <label>Outros
+      <input type="number" name="n_others" min="0" step="1" value="0" required>
+    </label>
+  </div>
+
+  <fieldset>
+    <label>
+      <input type="checkbox" name="gamer">
+      Cliente Gamer (x2 no total)
+    </label>
+  </fieldset>
+
+  <button type="submit">Calcular</button>
+</form>
+
+<hr />
+<div id="calc-area">
+  <small>Preencha os campos acima e clique em <em>Calcular</em> para ver o plano recomendado.</small>
+</div>
+{% endblock %}

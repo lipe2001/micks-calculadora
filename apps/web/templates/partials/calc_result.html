@@ -1,0 +1,38 @@
+<article>
+  <h4>Resultado</h4>
+  <p>
+    <strong>Peso total:</strong> {{ '%.2f'|format(result.total_weight) }}<br>
+    <strong>Plano:</strong> {{ result.plan }}<br>
+    <strong>Velocidade:</strong> {{ result.speed_mbps }} Mb
+  </p>
+</article>
+
+<details open>
+  <summary>Contratar</summary>
+  <form
+    hx-post="/_contract"
+    hx-target="#calc-area"
+    hx-swap="innerHTML"
+  >
+    <!-- Repasse dos dispositivos/gamer como hidden para o contrato -->
+    <input type="hidden" name="n_cellphones" value="{{ payload.n_cellphones }}">
+    <input type="hidden" name="n_computers"  value="{{ payload.n_computers }}">
+    <input type="hidden" name="n_smart_tvs"  value="{{ payload.n_smart_tvs }}">
+    <input type="hidden" name="n_tv_box"     value="{{ payload.n_tv_box }}">
+    <input type="hidden" name="n_others"     value="{{ payload.n_others }}">
+    <input type="hidden" name="gamer"        value="{{ payload.gamer }}">
+
+    <div class="grid">
+      <label>Nome
+        <input type="text" name="name" required minlength="2" maxlength="120" placeholder="Seu nome completo">
+      </label>
+      <label>E-mail
+        <input type="email" name="email" required placeholder="voce@exemplo.com">
+      </label>
+      <label>Telefone
+        <input type="tel" name="phone" required minlength="6" maxlength="20" placeholder="11988887777">
+      </label>
+    </div>
+    <button type="submit">Confirmar contratação</button>
+  </form>
+</details>

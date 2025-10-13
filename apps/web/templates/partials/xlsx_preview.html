@@ -1,0 +1,16 @@
+<article>
+  <h5>Pré-visualização: {{ filename }}</h5>
+  <div style="max-width:100%; overflow:auto;">
+    <table>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          {% for col in row %}
+          <td>{{ col }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</article>
