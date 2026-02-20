@@ -4,56 +4,61 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vendas</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <main class="container">
     <div class="top">
-      <h1>Vendas registradas</h1>
-      <form method="post" action="/logout"><button type="submit">Sair</button></form>
+      <h1 class="page-title"><i class="bi bi-graph-up-arrow"></i> Vendas registradas</h1>
+      <form method="post" action="/logout"><button type="submit"><i class="bi bi-box-arrow-right"></i> Sair</button></form>
     </div>
 
     <form class="card" method="get" action="/vendas">
-      <label>Filtrar por cliente <input type="text" name="name" value="{{ name }}" /></label>
-      <label>Ordenar por
-        <select name="sort_by">
-          <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Data</option>
-          <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Nome</option>
-        </select>
-      </label>
-      <button type="submit">Aplicar</button>
+      <div class="grid">
+        <label><span class="icon-label"><i class="bi bi-search"></i> Filtrar por cliente</span><input type="text" name="name" value="{{ name }}" /></label>
+        <label><span class="icon-label"><i class="bi bi-sort-down"></i> Ordenar por</span>
+          <select name="sort_by">
+            <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Data</option>
+            <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Nome</option>
+          </select>
+        </label>
+      </div>
+      <button type="submit"><i class="bi bi-funnel-fill"></i> Aplicar</button>
     </form>
 
     {% if error %}<p class="error-text">Erro ao carregar vendas: {{ error }}</p>{% endif %}
 
-    <table>
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Nome</th>
-          <th>E-mail</th>
-          <th>Telefone</th>
-          <th>Dispositivos</th>
-          <th>Peso total</th>
-          <th>Plano</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for sale in sales %}
-        <tr>
-          <td>{{ sale.created_at }}</td>
-          <td>{{ sale.name }}</td>
-          <td>{{ sale.email }}</td>
-          <td>{{ sale.phone }}</td>
-          <td>{{ sale.devices }}</td>
-          <td>{{ sale.total_weight }}</td>
-          <td>{{ sale.plan_name }} ({{ sale.plan_speed }})</td>
-        </tr>
-        {% else %}
-        <tr><td colspan="7">Nenhuma venda encontrada.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th>Dispositivos</th>
+            <th>Peso total</th>
+            <th>Plano</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sale in sales %}
+          <tr>
+            <td>{{ sale.created_at }}</td>
+            <td>{{ sale.name }}</td>
+            <td>{{ sale.email }}</td>
+            <td>{{ sale.phone }}</td>
+            <td>{{ sale.devices }}</td>
+            <td>{{ sale.total_weight }}</td>
+            <td>{{ sale.plan_name }} ({{ sale.plan_speed }})</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7">Nenhuma venda encontrada.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </main>
 </body>
 </html>

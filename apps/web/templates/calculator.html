@@ -4,38 +4,39 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calculadora de Plano</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <main class="container">
-    <h1>Calculadora de Plano de Internet</h1>
-    <p>Informe os dispositivos para obter o plano sugerido automaticamente.</p>
+    <h1 class="page-title"><i class="bi bi-router-fill"></i> Calculadora de Plano de Internet</h1>
+    <p class="subtitle">Informe os dispositivos para obter o plano sugerido automaticamente.</p>
 
     <section class="card">
       <div class="grid">
-        <label>Celulares <input type="number" id="cellphones" min="0" value="0" /></label>
-        <label>Computadores <input type="number" id="computers" min="0" value="0" /></label>
-        <label>Smart TVs <input type="number" id="smart_tvs" min="0" value="0" /></label>
-        <label>TV Box <input type="number" id="tv_boxes" min="0" value="0" /></label>
-        <label>Outros <input type="number" id="others" min="0" value="0" /></label>
+        <label><span class="icon-label"><i class="bi bi-phone-fill"></i> Celulares</span><input type="number" id="cellphones" min="0" value="0" /></label>
+        <label><span class="icon-label"><i class="bi bi-laptop-fill"></i> Computadores</span><input type="number" id="computers" min="0" value="0" /></label>
+        <label><span class="icon-label"><i class="bi bi-tv-fill"></i> Smart TVs</span><input type="number" id="smart_tvs" min="0" value="0" /></label>
+        <label><span class="icon-label"><i class="bi bi-display-fill"></i> TV Box</span><input type="number" id="tv_boxes" min="0" value="0" /></label>
+        <label><span class="icon-label"><i class="bi bi-hdd-stack-fill"></i> Outros</span><input type="number" id="others" min="0" value="0" /></label>
       </div>
-      <label class="check"><input type="checkbox" id="gamer" /> Cliente Gamer (2x no peso total)</label>
+      <label class="check"><input type="checkbox" id="gamer" /> <i class="bi bi-controller"></i> Cliente Gamer (2x no peso total)</label>
     </section>
 
     <section id="result" class="card muted">Preencha os campos para calcular o plano.</section>
 
     <section class="card">
-      <h3>Contratar plano</h3>
+      <h3 class="page-title"><i class="bi bi-bag-check-fill"></i> Contratar plano</h3>
       <div class="grid">
-        <label>Nome <input type="text" id="name" /></label>
-        <label>E-mail <input type="email" id="email" /></label>
-        <label>Telefone <input type="text" id="phone" /></label>
+        <label><span class="icon-label"><i class="bi bi-person-fill"></i> Nome</span><input type="text" id="name" /></label>
+        <label><span class="icon-label"><i class="bi bi-envelope-fill"></i> E-mail</span><input type="email" id="email" /></label>
+        <label><span class="icon-label"><i class="bi bi-telephone-fill"></i> Telefone</span><input type="text" id="phone" /></label>
       </div>
-      <button id="contract-btn" type="button">Confirmar contratação</button>
+      <button id="contract-btn" type="button"><i class="bi bi-send-check-fill"></i> Confirmar contratação</button>
       <div id="contract-feedback"></div>
     </section>
 
-    <p><a href="/vendas">Ir para painel de vendas</a></p>
+    <p><a class="nav-link" href="/vendas"><i class="bi bi-bar-chart-fill"></i> Ir para painel de vendas</a></p>
   </main>
 
   <script>
@@ -62,8 +63,8 @@
       }
       resultEl.classList.remove("muted");
       resultEl.innerHTML = `
-        <h2>Plano sugerido: ${data.plan_name} (${data.plan_speed})</h2>
-        <p>Peso total calculado: <strong>${data.total_weight}</strong></p>
+        <h2 class='page-title'><i class='bi bi-stars'></i> Plano sugerido: ${data.plan_name} (${data.plan_speed})</h2>
+        <p><i class='bi bi-speedometer2'></i> Peso total calculado: <strong>${data.total_weight}</strong></p>
         <details><summary>Ver pesos individuais</summary><pre>${JSON.stringify(data.device_weights, null, 2)}</pre></details>
       `;
     }
