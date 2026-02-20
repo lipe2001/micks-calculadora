@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Plano</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="brand card">
+      <div>
+        <h1 class="page-title"><i class="bi bi-router-fill"></i> Calculadora de Plano de Internet</h1>
+        <p class="subtitle">Informe os dispositivos para obter o plano sugerido automaticamente.</p>
+      </div>
+      <img class="brand-logo" src="/static/img/micks-logo-blue.png" alt="Micks Fibra" onerror="this.style.display='none'" />
+    </header>
+
+    <section class="card">
+      <div class="grid">
+        <label><span class="icon-label"><i class="bi bi-phone-fill"></i> Celulares</span><input type="number" id="cellphones" min="0" value="0" /></label>
+        <label><span class="icon-label"><i class="bi bi-laptop-fill"></i> Computadores</span><input type="number" id="computers" min="0" value="0" /></label>
+        <label><span class="icon-label"><i class="bi bi-tv-fill"></i> Smart TVs</span><input type="number" id="smart_tvs" min="0" value="0" /></label>
+        <label><span class="icon-label"><i class="bi bi-display-fill"></i> TV Box</span><input type="number" id="tv_boxes" min="0" value="0" /></label>
+        <label><span class="icon-label"><i class="bi bi-hdd-stack-fill"></i> Outros</span><input type="number" id="others" min="0" value="0" /></label>
+      </div>
+      <label class="check"><input type="checkbox" id="gamer" /> <i class="bi bi-controller"></i> Cliente Gamer (2x no peso total)</label>
+    </section>
+
+    <section id="result" class="card muted">Preencha os campos para calcular o plano.</section>
+
+    <section class="card">
+      <h3 class="page-title"><i class="bi bi-bag-check-fill"></i> Contratar plano</h3>
+      <div class="grid">
+        <label><span class="icon-label"><i class="bi bi-person-fill"></i> Nome</span><input type="text" id="name" /></label>
+        <label><span class="icon-label"><i class="bi bi-envelope-fill"></i> E-mail</span><input type="email" id="email" /></label>
+        <label><span class="icon-label"><i class="bi bi-telephone-fill"></i> Telefone</span><input type="text" id="phone" /></label>
+      </div>
+      <button id="contract-btn" type="button"><i class="bi bi-send-check-fill"></i> Confirmar contratação</button>
+      <div id="contract-feedback"></div>
+    </section>
+
+    <p><a class="nav-link" href="/vendas"><i class="bi bi-bar-chart-fill"></i> Ir para painel de vendas</a></p>
+  </main>
+
+  <script>
+    const ids = ["cellphones", "computers", "smart_tvs", "tv_boxes", "others"];
+    const labels = {
+      cellphones: { label: "Celulares", icon: "bi-phone-fill" },
+      computers: { label: "Computadores", icon: "bi-laptop-fill" },
+      smart_tvs: { label: "Smart TVs", icon: "bi-tv-fill" },
+      tv_boxes: { label: "TV Box", icon: "bi-display-fill" },
+      others: { label: "Outros dispositivos", icon: "bi-hdd-stack-fill" },
+    };
+    let latestPayload = null;
+
+    function currentPayload() {
+      const devices = Object.fromEntries(ids.map((id) => [id, Number(document.getElementById(id).value || 0)]));
+      return { ...devices, gamer: document.getElementById("gamer").checked };
+    }
+
+    function weightsHtml(deviceWeights) {
+      return Object.entries(labels).map(([key, meta]) => {
+        const value = Number(deviceWeights?.[key] ?? 0).toFixed(2);
+        return `
+          <div class='weight-item'>
+            <span class='left'><i class='bi ${meta.icon}'></i> ${meta.label}</span>
+            <span class='value'>${value}</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function calculate() {
+      latestPayload = currentPayload();
+      const resultEl = document.getElementById("result");
+      const res = await fetch("/calculadora_plano/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(latestPayload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        resultEl.innerHTML = `<p class='error-text'>Erro no cálculo: ${JSON.stringify(data)}</p>`;
+        return;
+      }
+      resultEl.classList.remove("muted");
+      resultEl.innerHTML = `
+        <h2 class='page-title'><i class='bi bi-stars'></i> Plano sugerido: ${data.plan_name} (${data.plan_speed})</h2>
+        <p><i class='bi bi-speedometer2'></i> Peso total calculado: <strong>${Number(data.total_weight).toFixed(2)}</strong></p>
+        <details>
+          <summary><i class='bi bi-list-check'></i> Ver pesos individuais</summary>
+          <div class='weights-grid'>${weightsHtml(data.device_weights)}</div>
+        </details>
+      `;
+    }
+
+    async function contract() {
+      if (!latestPayload) await calculate();
+      const payload = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        devices: latestPayload,
+      };
+      const fb = document.getElementById("contract-feedback");
+      const res = await fetch("/calculadora_plano/contract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      fb.innerHTML = `<div class='feedback ${data.ok ? "ok" : "error"}'>${data.message}</div>`;
+    }
+
+    ids.concat(["gamer"]).forEach((id) => document.getElementById(id).addEventListener("input", calculate));
+    document.getElementById("contract-btn").addEventListener("click", contract);
+    calculate();
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{% if result %}
+<h2>Plano sugerido: {{ result.plan_name }} ({{ result.plan_speed }})</h2>
+<p>Peso total calculado: <strong>{{ result.total_weight }}</strong></p>
+<details>
+  <summary>Ver pesos individuais</summary>
+  <pre>{{ result.device_weights }}</pre>
+</details>
+
+<form class="contract" hx-post="/calculadora_plano/contract" hx-target="#contract-feedback">
+  <h3>Contratar plano</h3>
+  <div class="grid">
+    <label>Nome <input type="text" name="name" required /></label>
+    <label>E-mail <input type="email" name="email" required /></label>
+    <label>Telefone <input type="text" name="phone" required /></label>
+  </div>
+
+  {% for key, value in form.items() %}
+    {% if value is sameas true %}
+      <input type="hidden" name="{{ key }}" value="true" />
+    {% elif value is sameas false %}
+      <input type="hidden" name="{{ key }}" value="false" />
+    {% else %}
+      <input type="hidden" name="{{ key }}" value="{{ value }}" />
+    {% endif %}
+  {% endfor %}
+
+  <button type="submit">Confirmar contratação</button>
+</form>
+<div id="contract-feedback"></div>
+{% endif %}
