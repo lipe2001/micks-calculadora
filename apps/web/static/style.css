@@ -155,3 +155,46 @@ th { color: #a9b7e8; background: #141f39; }
   .sales-actions { width: 100%; justify-content: flex-start; }
   .sales-grid { grid-template-columns: 1fr; }
 }
+
+
+/* espaçamento entre campos e botões para evitar elementos encostados */
+.card > button,
+.card > .btn-ghost,
+.card .grid + button,
+.card .grid + .filter-submit,
+.card .grid + .sales-actions,
+.card label + button {
+  margin-top: .75rem;
+}
+
+.sales-actions form,
+.sales-actions .btn-ghost {
+  margin-top: .25rem;
+}
+
+.sales-filter button,
+#contract-btn,
+#login-btn {
+  min-height: 42px;
+}
+
+@media (max-width: 900px) {
+  .sales-actions form,
+  .sales-actions .btn-ghost,
+  .card > button,
+  .card > .btn-ghost {
+    width: 100%;
+  }
+}
+
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+  filter: grayscale(.25);
+}
+
+#contract-hint {
+  display: block;
+  margin-top: .55rem;
+}

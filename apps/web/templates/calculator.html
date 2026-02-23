@@ -33,11 +33,12 @@
     <section class="card">
       <h3 class="page-title"><i class="bi bi-bag-check-fill"></i> Contratar plano</h3>
       <div class="grid">
-        <label><span class="icon-label"><i class="bi bi-person-fill"></i> Nome</span><input type="text" id="name" /></label>
-        <label><span class="icon-label"><i class="bi bi-envelope-fill"></i> E-mail</span><input type="email" id="email" /></label>
-        <label><span class="icon-label"><i class="bi bi-telephone-fill"></i> Telefone</span><input type="text" id="phone" /></label>
+        <label><span class="icon-label"><i class="bi bi-person-fill"></i> Nome</span><input type="text" id="name" minlength="2" required /></label>
+        <label><span class="icon-label"><i class="bi bi-envelope-fill"></i> E-mail</span><input type="email" id="email" required /></label>
+        <label><span class="icon-label"><i class="bi bi-telephone-fill"></i> Telefone</span><input type="text" id="phone" minlength="8" required /></label>
       </div>
-      <button id="contract-btn" type="button"><i class="bi bi-send-check-fill"></i> Confirmar contratação</button>
+      <button id="contract-btn" type="button" disabled title="Preencha nome, e-mail e telefone válidos"><i class="bi bi-send-check-fill"></i> Confirmar contratação</button>
+      <small id="contract-hint" class="muted">Preencha nome (mín. 2), e-mail válido e telefone (mín. 8) para habilitar.</small>
       <div id="contract-feedback"></div>
     </section>
 
@@ -53,11 +54,32 @@
       tv_boxes: { label: "TV Box", icon: "bi-display-fill" },
       others: { label: "Outros dispositivos", icon: "bi-hdd-stack-fill" },
     };
+
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const phoneInput = document.getElementById("phone");
+    const contractBtn = document.getElementById("contract-btn");
+    const contractHint = document.getElementById("contract-hint");
+
     let latestPayload = null;
 
     function currentPayload() {
       const devices = Object.fromEntries(ids.map((id) => [id, Number(document.getElementById(id).value || 0)]));
       return { ...devices, gamer: document.getElementById("gamer").checked };
+    }
+
+    function isContractFormValid() {
+      const nameOk = nameInput.value.trim().length >= 2;
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim());
+      const phoneOk = phoneInput.value.trim().length >= 8;
+      return nameOk && emailOk && phoneOk;
+    }
+
+    function updateContractButtonState() {
+      const valid = isContractFormValid();
+      contractBtn.disabled = !valid;
+      contractBtn.title = valid ? "" : "Preencha nome, e-mail e telefone válidos";
+      contractHint.style.display = valid ? "none" : "block";
     }
 
     function weightsHtml(deviceWeights) {
@@ -97,11 +119,15 @@
     }
 
     async function contract() {
+      if (!isContractFormValid()) {
+        updateContractButtonState();
+        return;
+      }
       if (!latestPayload) await calculate();
       const payload = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value,
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        phone: phoneInput.value.trim(),
         devices: latestPayload,
       };
       const fb = document.getElementById("contract-feedback");
@@ -115,8 +141,11 @@
     }
 
     ids.concat(["gamer"]).forEach((id) => document.getElementById(id).addEventListener("input", calculate));
-    document.getElementById("contract-btn").addEventListener("click", contract);
+    [nameInput, emailInput, phoneInput].forEach((el) => el.addEventListener("input", updateContractButtonState));
+
+    contractBtn.addEventListener("click", contract);
     calculate();
+    updateContractButtonState();
   </script>
 </body>
 </html>
