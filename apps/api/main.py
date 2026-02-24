@@ -79,6 +79,13 @@ class ContractInput(BaseModel):
     devices: DeviceInput
 
 
+class SaleUpdateInput(BaseModel):
+    name: str = Field(min_length=2, max_length=120)
+    email: EmailStr
+    phone: str = Field(min_length=8, max_length=40)
+    devices: DeviceInput
+
+
 class SaleResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -131,6 +138,10 @@ def calculate_plan(devices: DeviceInput) -> PlanResult:
         plan_name=plan_name,
         plan_speed=plan_speed,
     )
+
+
+def normalize_name(name: str) -> str:
+    return name.strip().upper()
 
 
 def send_email(to_email: str, subject: str, body: str) -> None:
@@ -196,9 +207,10 @@ def api_calculate(payload: DeviceInput):
 def api_contract(payload: ContractInput, db: Session = Depends(get_db)):
     result = calculate_plan(payload.devices)
     now = datetime.now(timezone.utc)
+    normalized_name = normalize_name(payload.name)
 
     sale = Sale(
-        name=payload.name,
+        name=normalized_name,
         email=payload.email,
         phone=payload.phone,
         devices=payload.devices.model_dump(exclude={"gamer"}),
@@ -213,12 +225,12 @@ def api_contract(payload: ContractInput, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(sale)
 
-    email_body = build_contract_email(payload.name, payload.phone, payload.devices, result)
+    email_body = build_contract_email(normalized_name, payload.phone, payload.devices, result)
     ops_email = os.getenv("OPERATIONS_EMAIL", "operacoes@micks.com.br")
 
     try:
         send_email(payload.email, "Confirmação da contratação - Micks", email_body)
-        send_email(ops_email, f"Nova venda - {payload.name}", email_body)
+        send_email(ops_email, f"Nova venda - {normalized_name}", email_body)
     except OSError:
         # Não impede a venda quando SMTP estiver indisponível em desenvolvimento.
         pass
@@ -243,3 +255,44 @@ def api_sales(
         query = query.order_by(Sale.created_at.desc())
 
     return list(db.scalars(query).all())
+
+
+@app.get("/api/sales/{sale_id}", response_model=SaleResponse, dependencies=[Depends(require_admin)])
+def api_sale_by_id(sale_id: int, db: Session = Depends(get_db)):
+    sale = db.get(Sale, sale_id)
+    if not sale:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Venda não encontrada")
+    return sale
+
+
+@app.put("/api/sales/{sale_id}", response_model=SaleResponse, dependencies=[Depends(require_admin)])
+def api_update_sale(sale_id: int, payload: SaleUpdateInput, db: Session = Depends(get_db)):
+    sale = db.get(Sale, sale_id)
+    if not sale:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Venda não encontrada")
+
+    result = calculate_plan(payload.devices)
+    sale.name = normalize_name(payload.name)
+    sale.email = payload.email
+    sale.phone = payload.phone
+    sale.devices = payload.devices.model_dump(exclude={"gamer"})
+    sale.gamer = payload.devices.gamer
+    sale.device_weights = result.device_weights
+    sale.total_weight = result.total_weight
+    sale.plan_name = result.plan_name
+    sale.plan_speed = result.plan_speed
+
+    db.add(sale)
+    db.commit()
+    db.refresh(sale)
+    return sale
+
+
+@app.delete("/api/sales/{sale_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_admin)])
+def api_delete_sale(sale_id: int, db: Session = Depends(get_db)):
+    sale = db.get(Sale, sale_id)
+    if not sale:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Venda não encontrada")
+
+    db.delete(sale)
+    db.commit()

@@ -35,6 +35,7 @@
       </div>
     </form>
 
+    {% if notice %}<p class="feedback ok">{{ notice }}</p>{% endif %}
     {% if error %}<p class="error-text">Erro ao carregar vendas: {{ error }}</p>{% endif %}
 
     <div class="table-wrap card sales-table-card">
@@ -47,6 +48,7 @@
             <th>Dispositivos</th>
             <th>Peso total</th>
             <th>Plano</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -70,9 +72,17 @@
               <strong>{{ sale.plan_name }}</strong><br />
               <span class="muted">{{ sale.plan_speed }}</span>
             </td>
+            <td>
+              <div class="row-actions">
+                <a class="btn-ghost btn-small" href="/vendas/{{ sale.id }}/editar"><i class="bi bi-pencil-square"></i> Editar</a>
+                <form method="post" action="/vendas/{{ sale.id }}/excluir" onsubmit="return confirm('Deseja realmente excluir esta venda?');">
+                  <button type="submit" class="btn-danger btn-small"><i class="bi bi-trash"></i> Excluir</button>
+                </form>
+              </div>
+            </td>
           </tr>
           {% else %}
-          <tr><td colspan="6">Nenhuma venda encontrada.</td></tr>
+          <tr><td colspan="7">Nenhuma venda encontrada.</td></tr>
           {% endfor %}
         </tbody>
       </table>

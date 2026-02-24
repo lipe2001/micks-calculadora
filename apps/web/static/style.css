@@ -198,3 +198,23 @@ button:disabled {
   display: block;
   margin-top: .55rem;
 }
+.row-actions {
+  display: flex;
+  gap: .4rem;
+  flex-wrap: wrap;
+}
+
+.btn-small {
+  padding: .45rem .62rem;
+  font-size: .78rem;
+}
+
+.btn-danger {
+  background: linear-gradient(180deg, #f27d8f 0%, #dd5c72 100%);
+  color: #fff;
+  border-color: transparent;
+}
+
+.uppercase-input {
+  text-transform: uppercase;
+}
